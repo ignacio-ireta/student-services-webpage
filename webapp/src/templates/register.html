@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Course Registration</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control") }}
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.student_id.label(class="form-label") }}
+                        {{ form.student_id(class="form-control") }}
+                        {% if form.student_id.errors %}
+                            {% for error in form.student_id.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.courses.label(class="form-label") }}
+                        {{ form.courses(class="form-select", size="6", multiple=true) }}
+                        <div class="form-text">
+                            Hold Ctrl (Windows) or Command (Mac) to select multiple courses.
+                        </div>
+                        {% if form.courses.errors %}
+                            {% for error in form.courses.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {{ form.submit(class="btn btn-primary") }}
+                    
+                    {% if form.student_id.data %}
+                        <a href="{{ url_for('view_enrollments', student_id=form.student_id.data) }}" class="btn btn-info ms-2">View Current Enrollments</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        {% if registrations %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="mb-0">Current Enrollments</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for reg in registrations %}
+                    <li class="list-group-item">{{ reg.course_code }} - {{ reg.course_name }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <div class="mt-3">
+                    <a href="{{ url_for('manage_enrollments', student_id=form.student_id.data) }}" class="btn btn-warning">Manage Enrollments</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

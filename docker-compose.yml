@@ -1,0 +1,73 @@
+services:
+  webapp:
+    build: ./webapp
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=mysql://user:password@mysql/student_registration
+    depends_on:
+      - mysql
+    volumes:
+      - ./webapp/src:/app
+    networks:
+      - app-network
+
+  mysql:
+    build: ./mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    build: ./postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cdc:
+    build: ./cdc-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=cdc_user
+      - MYSQL_PASSWORD=cdc_password
+      - MYSQL_DATABASE=student_registration
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=student_registration_backup
+      - POLL_INTERVAL_SECONDS=60
+      - BATCH_SIZE=1000
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  postgres_data:

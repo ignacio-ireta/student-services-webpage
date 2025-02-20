@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Drop Courses</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.student_id.label(class="form-label") }}
+                        {{ form.student_id(class="form-control", readonly=true if student else false) }}
+                        {% if not student and form.student_id.data %}
+                            <div class="alert alert-warning mt-2">
+                                No student found with this ID.
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if student %}
+                        <div class="mb-3">
+                            <p><strong>Name:</strong> {{ student.name }}</p>
+                        </div>
+                        
+                        {% if form.courses_to_drop.choices %}
+                            <div class="mb-3">
+                                {{ form.courses_to_drop.label(class="form-label") }}
+                                {{ form.courses_to_drop(class="form-select", size="6", multiple=true) }}
+                                <div class="form-text">
+                                    Hold Ctrl (Windows) or Command (Mac) to select multiple courses to drop.
+                                </div>
+                            </div>
+                            
+                            {{ form.submit(class="btn btn-danger") }}
+                        {% else %}
+                            <div class="alert alert-info">
+                                This student is not currently enrolled in any courses.
+                            </div>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('view_enrollments', student_id=student.student_id) }}" class="btn btn-secondary ms-2">Back to Dashboard</a>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">Find Student</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
