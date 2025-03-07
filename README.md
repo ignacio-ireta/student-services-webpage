@@ -56,7 +56,7 @@ This project implements a custom polling-based CDC solution that:
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/student-services-webpage.git
+git clone https://github.com/ignacio-ireta/student-services-webpage.git
 cd student-services-webpage
 ```
 
